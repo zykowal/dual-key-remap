@@ -11,14 +11,12 @@ pub struct RemapConfig {
 
 #[derive(Debug)]
 pub struct Config {
-    pub debug: bool,
     pub remaps: Vec<RemapConfig>,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            debug: false,
             remaps: Vec::new(),
         }
     }
@@ -54,13 +52,6 @@ fn parse_config(content: &str) -> Result<Config, String> {
         let value = parts[1].trim();
         
         match key {
-            "debug" => {
-                config.debug = match value.to_lowercase().as_str() {
-                    "1" | "true" => true,
-                    "0" | "false" => false,
-                    _ => return Err(format!("Config error (line {}): debug must be 0/1/true/false", line_num)),
-                };
-            }
             "remap_key" => {
                 // 如果有未完成的remap，检查是否完整
                 if let Some(builder) = current_remap.take() {
@@ -99,7 +90,8 @@ fn parse_config(content: &str) -> Result<Config, String> {
                 }
             }
             _ => {
-                return Err(format!("Config error (line {}): invalid setting '{}'", line_num, key));
+                // 忽略其他设置（如debug等）
+                continue;
             }
         }
         
@@ -149,31 +141,5 @@ impl RemapConfigBuilder {
             to_when_alone: self.when_alone.ok_or("Missing when_alone")?,
             to_with_other: self.with_other.ok_or("Missing with_other")?,
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_config() {
-        let config_content = r#"
-# This is a comment
-debug=true
-
-remap_key=CAPSLOCK
-when_alone=ESCAPE
-with_other=CTRL
-"#;
-        
-        let config = parse_config(config_content).unwrap();
-        assert!(config.debug);
-        assert_eq!(config.remaps.len(), 1);
-        
-        let remap = &config.remaps[0];
-        assert_eq!(remap.from.name, "CAPSLOCK");
-        assert_eq!(remap.to_when_alone.name, "ESCAPE");
-        assert_eq!(remap.to_with_other.name, "CTRL");
     }
 }

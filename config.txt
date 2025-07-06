@@ -9,8 +9,6 @@
 # Example: Make Caps Lock act as Escape when pressed alone,
 # and as Ctrl when pressed with other keys
 
-debug=false
-
 remap_key=CAPSLOCK
 when_alone=ESCAPE
 with_other=CTRL

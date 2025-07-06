@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeyDef {
     pub name: &'static str,
@@ -86,20 +84,6 @@ pub const KEYS: &[KeyDef] = &[
     KeyDef { name: "F12", virt_code: 0x7B, scan_code: 0x58 },
 ];
 
-pub fn create_key_map() -> HashMap<&'static str, KeyDef> {
-    KEYS.iter().map(|key| (key.name, *key)).collect()
-}
-
 pub fn find_key_by_name(name: &str) -> Option<KeyDef> {
     KEYS.iter().find(|key| key.name.eq_ignore_ascii_case(name)).copied()
-}
-
-pub fn find_key_by_virt_code(virt_code: u32) -> Option<KeyDef> {
-    KEYS.iter().find(|key| key.virt_code == virt_code).copied()
-}
-
-pub fn friendly_virt_code_name(virt_code: u32) -> &'static str {
-    find_key_by_virt_code(virt_code)
-        .map(|key| key.name)
-        .unwrap_or("UNKNOWN")
 }

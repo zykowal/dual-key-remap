@@ -6,15 +6,6 @@ pub enum Direction {
     Down,
 }
 
-impl Direction {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Direction::Up => "UP",
-            Direction::Down => "DOWN",
-        }
-    }
-}
-
 pub fn send_input(key_def: &KeyDef, direction: Direction) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
@@ -29,12 +20,10 @@ pub fn send_input(key_def: &KeyDef, direction: Direction) -> Result<(), String> 
                     dwFlags: {
                         let mut flags = KEYBD_EVENT_FLAGS(0);
                         
-                        // 设置按键释放标志
                         if direction == Direction::Up {
                             flags |= KEYEVENTF_KEYUP;
                         }
                         
-                        // 检查是否是扩展键（扫描码高字节为0xE0）
                         if (key_def.scan_code >> 8) == 0xE0 {
                             flags |= KEYEVENTF_EXTENDEDKEY;
                         }
@@ -60,7 +49,11 @@ pub fn send_input(key_def: &KeyDef, direction: Direction) -> Result<(), String> 
     #[cfg(not(target_os = "windows"))]
     {
         // 在非Windows系统上，只是打印模拟信息
-        println!("Simulating key input: {} {}", key_def.name, direction.as_str());
+        let direction_str = match direction {
+            Direction::Up => "UP",
+            Direction::Down => "DOWN",
+        };
+        println!("Simulating key input: {} {}", key_def.name, direction_str);
         Ok(())
     }
 }

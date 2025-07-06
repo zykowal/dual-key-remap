@@ -4,14 +4,10 @@ mod keys;
 mod remap;
 
 use config::load_config;
-use input::{Direction, MOUSE_DUMMY_VK};
 use remap::RemapManager;
 use std::env;
 use std::path::PathBuf;
 use std::sync::Mutex;
-
-// 由于我们在macOS上，这里只是一个演示版本
-// 实际的Windows API调用需要在Windows环境中编译和运行
 
 // 全局状态
 static REMAP_MANAGER: Mutex<Option<RemapManager>> = Mutex::new(None);
@@ -44,7 +40,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     
     println!("Configuration loaded successfully!");
-    println!("Debug mode: {}", config.debug);
     println!("Number of remaps: {}", config.remaps.len());
     
     for (i, remap) in config.remaps.iter().enumerate() {
@@ -55,11 +50,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                  remap.to_with_other.name);
     }
     
-    // 检查环境变量中的DEBUG设置
-    let debug = config.debug || env::var("DEBUG").is_ok();
-    
     // 创建重映射管理器
-    let manager = RemapManager::new(config.remaps, debug);
+    let manager = RemapManager::new(config.remaps);
     *REMAP_MANAGER.lock().unwrap() = Some(manager);
     
     println!("\nNote: This is a demonstration version running on macOS.");
@@ -69,7 +61,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "windows")]
     {
         println!("\nStarting Windows key remapping...");
-        // 这里会包含实际的Windows API调用
         windows_main()?;
     }
     
@@ -85,6 +76,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 #[cfg(target_os = "windows")]
 fn windows_main() -> Result<(), Box<dyn std::error::Error>> {
+    use input::{Direction, MOUSE_DUMMY_VK};
     use windows::core::*;
     use windows::Win32::Foundation::*;
     use windows::Win32::System::Console::*;
@@ -111,7 +103,6 @@ fn windows_main() -> Result<(), Box<dyn std::error::Error>> {
             if let Ok(mut manager_guard) = REMAP_MANAGER.lock() {
                 if let Some(ref mut manager) = *manager_guard {
                     let block_input = manager.handle_input(
-                        kb_struct.scanCode,
                         kb_struct.vkCode,
                         direction,
                         is_injected,
@@ -134,7 +125,7 @@ fn windows_main() -> Result<(), Box<dyn std::error::Error>> {
                 | WM_XBUTTONDOWN | WM_NCXBUTTONDOWN => {
                     if let Ok(mut manager_guard) = REMAP_MANAGER.lock() {
                         if let Some(ref mut manager) = *manager_guard {
-                            let block_input = manager.handle_input(0, MOUSE_DUMMY_VK, Direction::Down, false);
+                            let block_input = manager.handle_input(MOUSE_DUMMY_VK, Direction::Down, false);
                             
                             if block_input {
                                 return LRESULT(1);
@@ -194,21 +185,10 @@ fn windows_main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     
-    // 检查是否为调试模式
-    let debug = env::var("DEBUG").is_ok() || {
-        if let Ok(manager_guard) = REMAP_MANAGER.lock() {
-            manager_guard.as_ref().map(|m| m.is_debug()).unwrap_or(false)
-        } else {
-            false
-        }
-    };
+    println!("Key remapping started. Press Ctrl+C to exit.");
     
-    if debug {
-        println!("-- DEBUG MODE --");
-    } else {
-        // 隐藏控制台窗口
-        FreeConsole()?;
-    }
+    // 隐藏控制台窗口
+    FreeConsole()?;
     
     // 消息循环
     unsafe {
