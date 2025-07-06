@@ -1,0 +1,16 @@
+# Dual Key Remap Configuration
+# 
+# This file configures key remapping behavior.
+# Each remap requires three lines:
+# - remap_key: the key to remap
+# - when_alone: what key to send when pressed alone
+# - with_other: what key to act as when pressed with other keys
+#
+# Example: Make Caps Lock act as Escape when pressed alone,
+# and as Ctrl when pressed with other keys
+
+debug=false
+
+remap_key=CAPSLOCK
+when_alone=ESCAPE
+with_other=CTRL

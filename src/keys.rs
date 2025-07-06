@@ -1,0 +1,105 @@
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KeyDef {
+    pub name: &'static str,
+    pub virt_code: u32,
+    pub scan_code: u32,
+}
+
+// 常用键的定义
+pub const KEYS: &[KeyDef] = &[
+    KeyDef { name: "CAPSLOCK", virt_code: 0x14, scan_code: 0x3A },
+    KeyDef { name: "ESCAPE", virt_code: 0x1B, scan_code: 0x01 },
+    KeyDef { name: "CTRL", virt_code: 0x11, scan_code: 0x1D },
+    KeyDef { name: "LCTRL", virt_code: 0xA2, scan_code: 0x1D },
+    KeyDef { name: "RCTRL", virt_code: 0xA3, scan_code: 0xE01D },
+    KeyDef { name: "SHIFT", virt_code: 0x10, scan_code: 0x2A },
+    KeyDef { name: "LSHIFT", virt_code: 0xA0, scan_code: 0x2A },
+    KeyDef { name: "RSHIFT", virt_code: 0xA1, scan_code: 0x36 },
+    KeyDef { name: "ALT", virt_code: 0x12, scan_code: 0x38 },
+    KeyDef { name: "LALT", virt_code: 0xA4, scan_code: 0x38 },
+    KeyDef { name: "RALT", virt_code: 0xA5, scan_code: 0xE038 },
+    KeyDef { name: "SPACE", virt_code: 0x20, scan_code: 0x39 },
+    KeyDef { name: "ENTER", virt_code: 0x0D, scan_code: 0x1C },
+    KeyDef { name: "TAB", virt_code: 0x09, scan_code: 0x0F },
+    KeyDef { name: "BACKSPACE", virt_code: 0x08, scan_code: 0x0E },
+    KeyDef { name: "DELETE", virt_code: 0x2E, scan_code: 0xE053 },
+    KeyDef { name: "HOME", virt_code: 0x24, scan_code: 0xE047 },
+    KeyDef { name: "END", virt_code: 0x23, scan_code: 0xE04F },
+    KeyDef { name: "PAGEUP", virt_code: 0x21, scan_code: 0xE049 },
+    KeyDef { name: "PAGEDOWN", virt_code: 0x22, scan_code: 0xE051 },
+    KeyDef { name: "UP", virt_code: 0x26, scan_code: 0xE048 },
+    KeyDef { name: "DOWN", virt_code: 0x28, scan_code: 0xE050 },
+    KeyDef { name: "LEFT", virt_code: 0x25, scan_code: 0xE04B },
+    KeyDef { name: "RIGHT", virt_code: 0x27, scan_code: 0xE04D },
+    // 字母键
+    KeyDef { name: "A", virt_code: 0x41, scan_code: 0x1E },
+    KeyDef { name: "B", virt_code: 0x42, scan_code: 0x30 },
+    KeyDef { name: "C", virt_code: 0x43, scan_code: 0x2E },
+    KeyDef { name: "D", virt_code: 0x44, scan_code: 0x20 },
+    KeyDef { name: "E", virt_code: 0x45, scan_code: 0x12 },
+    KeyDef { name: "F", virt_code: 0x46, scan_code: 0x21 },
+    KeyDef { name: "G", virt_code: 0x47, scan_code: 0x22 },
+    KeyDef { name: "H", virt_code: 0x48, scan_code: 0x23 },
+    KeyDef { name: "I", virt_code: 0x49, scan_code: 0x17 },
+    KeyDef { name: "J", virt_code: 0x4A, scan_code: 0x24 },
+    KeyDef { name: "K", virt_code: 0x4B, scan_code: 0x25 },
+    KeyDef { name: "L", virt_code: 0x4C, scan_code: 0x26 },
+    KeyDef { name: "M", virt_code: 0x4D, scan_code: 0x32 },
+    KeyDef { name: "N", virt_code: 0x4E, scan_code: 0x31 },
+    KeyDef { name: "O", virt_code: 0x4F, scan_code: 0x18 },
+    KeyDef { name: "P", virt_code: 0x50, scan_code: 0x19 },
+    KeyDef { name: "Q", virt_code: 0x51, scan_code: 0x10 },
+    KeyDef { name: "R", virt_code: 0x52, scan_code: 0x13 },
+    KeyDef { name: "S", virt_code: 0x53, scan_code: 0x1F },
+    KeyDef { name: "T", virt_code: 0x54, scan_code: 0x14 },
+    KeyDef { name: "U", virt_code: 0x55, scan_code: 0x16 },
+    KeyDef { name: "V", virt_code: 0x56, scan_code: 0x2F },
+    KeyDef { name: "W", virt_code: 0x57, scan_code: 0x11 },
+    KeyDef { name: "X", virt_code: 0x58, scan_code: 0x2D },
+    KeyDef { name: "Y", virt_code: 0x59, scan_code: 0x15 },
+    KeyDef { name: "Z", virt_code: 0x5A, scan_code: 0x2C },
+    // 数字键
+    KeyDef { name: "0", virt_code: 0x30, scan_code: 0x0B },
+    KeyDef { name: "1", virt_code: 0x31, scan_code: 0x02 },
+    KeyDef { name: "2", virt_code: 0x32, scan_code: 0x03 },
+    KeyDef { name: "3", virt_code: 0x33, scan_code: 0x04 },
+    KeyDef { name: "4", virt_code: 0x34, scan_code: 0x05 },
+    KeyDef { name: "5", virt_code: 0x35, scan_code: 0x06 },
+    KeyDef { name: "6", virt_code: 0x36, scan_code: 0x07 },
+    KeyDef { name: "7", virt_code: 0x37, scan_code: 0x08 },
+    KeyDef { name: "8", virt_code: 0x38, scan_code: 0x09 },
+    KeyDef { name: "9", virt_code: 0x39, scan_code: 0x0A },
+    // 功能键
+    KeyDef { name: "F1", virt_code: 0x70, scan_code: 0x3B },
+    KeyDef { name: "F2", virt_code: 0x71, scan_code: 0x3C },
+    KeyDef { name: "F3", virt_code: 0x72, scan_code: 0x3D },
+    KeyDef { name: "F4", virt_code: 0x73, scan_code: 0x3E },
+    KeyDef { name: "F5", virt_code: 0x74, scan_code: 0x3F },
+    KeyDef { name: "F6", virt_code: 0x75, scan_code: 0x40 },
+    KeyDef { name: "F7", virt_code: 0x76, scan_code: 0x41 },
+    KeyDef { name: "F8", virt_code: 0x77, scan_code: 0x42 },
+    KeyDef { name: "F9", virt_code: 0x78, scan_code: 0x43 },
+    KeyDef { name: "F10", virt_code: 0x79, scan_code: 0x44 },
+    KeyDef { name: "F11", virt_code: 0x7A, scan_code: 0x57 },
+    KeyDef { name: "F12", virt_code: 0x7B, scan_code: 0x58 },
+];
+
+pub fn create_key_map() -> HashMap<&'static str, KeyDef> {
+    KEYS.iter().map(|key| (key.name, *key)).collect()
+}
+
+pub fn find_key_by_name(name: &str) -> Option<KeyDef> {
+    KEYS.iter().find(|key| key.name.eq_ignore_ascii_case(name)).copied()
+}
+
+pub fn find_key_by_virt_code(virt_code: u32) -> Option<KeyDef> {
+    KEYS.iter().find(|key| key.virt_code == virt_code).copied()
+}
+
+pub fn friendly_virt_code_name(virt_code: u32) -> &'static str {
+    find_key_by_virt_code(virt_code)
+        .map(|key| key.name)
+        .unwrap_or("UNKNOWN")
+}
